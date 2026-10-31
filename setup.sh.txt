@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+# ساختار صحیح پروژه Next.js را می‌سازد و فایل‌های تخت را جابه‌جا می‌کند.
+# اجرا: bash setup.sh
+set -e
+
+echo "▶ ساخت پوشه‌ها..."
+mkdir -p app/api/leads app/services/\[slug\] app/about components/ui components/layout components/sections data lib public
+
+echo "▶ جابه‌جایی فایل‌ها..."
+mv package.json.txt     package.json            2>/dev/null || mv package_json package.json
+mv tsconfig.json.txt    tsconfig.json           2>/dev/null || mv tsconfig_json tsconfig.json
+mv tailwind.config.ts.txt tailwind.config.ts    2>/dev/null || mv tailwind_config_ts tailwind.config.ts
+mv postcss.config.mjs.txt postcss.config.mjs    2>/dev/null || mv postcss_config_mjs postcss.config.mjs
+mv next.config.mjs.txt  next.config.mjs         2>/dev/null || mv next_config_mjs next.config.mjs
+
+mv app_globals_css      app/globals.css
+mv app_layout_tsx       app/layout.tsx
+mv app_page_tsx         app/page.tsx
+mv app_not_found_tsx    app/not-found.tsx
+mv app_sitemap_ts       app/sitemap.ts
+mv app_robots_ts        app/robots.ts
+mv app_api_leads_route_ts app/api/leads/route.ts
+mv app_services_slug_page_tsx "app/services/[slug]/page.tsx"
+mv app_about_page_tsx   app/about/page.tsx
+
+mv components_ui_core_tsx       components/ui/core.tsx
+mv components_layout_header_tsx components/layout/header.tsx
+mv components_sections_hero_tsx components/sections/hero.tsx
+mv components_sections_system_tsx components/sections/system.tsx
+mv components_sections_offerings_tsx components/sections/offerings.tsx
+mv components_sections_proof_contact_tsx components/sections/proof-contact.tsx
+
+mv data_content_ts      data/content.ts
+mv lib_site_config_ts   lib/site-config.ts
+mv env_local            .env.local
+
+echo "▶ نصب وابستگی‌ها..."
+npm install
+
+echo ""
+echo "✅ آماده است! اجرای محیط توسعه:"
+echo "   npm run dev"

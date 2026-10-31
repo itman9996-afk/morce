@@ -1,0 +1,69 @@
+# place-media.ps1 — پیدا کردن و جاگذاری خودکار رسانه‌ها
+# اجرا:  powershell -ExecutionPolicy Bypass -File place-media.ps1
+$ErrorActionPreference = 'SilentlyContinue'
+
+$videoExt = @('*.mp4','*.mov','*.mkv','*.webm','*.m4v')
+$imgExt   = @('*.jpg','*.jpeg','*.png','*.webp')
+$exclude  = 'node_modules|\.next|\.git|public\\videos|public\\images|\.leads'
+$roots    = @((Get-Location).Path, "$env:USERPROFILE\Desktop", "$env:USERPROFILE\Downloads", "$env:USERPROFILE\Videos")
+
+$videos = Get-ChildItem -Path $roots -Recurse -Include $videoExt -File |
+  Where-Object { $_.FullName -notmatch $exclude }
+$images = Get-ChildItem -Path $roots -Recurse -Include $imgExt -File |
+  Where-Object { $_.FullName -notmatch $exclude }
+
+function Show-List($items, $title) {
+  Write-Host "`n=== $title ===" -ForegroundColor Cyan
+  if (-not $items) { Write-Host "  (چیزی پیدا نشد)" -ForegroundColor Yellow; return }
+  $items | Sort-Object Length -Descending | ForEach-Object {
+    "{0,8:N1} MB  {1}" -f ($_.Length/1MB), $_.FullName
+  }
+}
+Show-List $videos "همه‌ی ویدیوهای پیدا شده"
+Show-List $images "همه‌ی عکس‌های پیدا شده"
+
+if (-not (Test-Path 'public\videos')) { New-Item -ItemType Directory -Path 'public\videos' -Force | Out-Null }
+if (-not (Test-Path 'public\images')) { New-Item -ItemType Directory -Path 'public\images' -Force | Out-Null }
+
+# ---- HERO: هر ویدیویی که «hero» در نامش دارد (بزرگ‌ترین) ----
+$hero = $videos | Where-Object { $_.Name -match 'hero' } | Sort-Object Length -Descending | Select-Object -First 1
+if ($hero) {
+  Copy-Item $hero.FullName 'public\videos\hero.mp4' -Force
+  Write-Host "`n[OK] HERO: '$($hero.Name)' -> public\videos\hero.mp4" -ForegroundColor Green
+} else {
+  Write-Host "`n[!!] هیچ ویدیویی با کلمه hero پیدا نشد — از لیست بالا نام ویدیوی هیروت را برایم بفرست." -ForegroundColor Yellow
+}
+
+# ---- پوستر هیرو: عکسی با نام hero ----
+$hposter = @($images | Where-Object { $_.Name -match 'hero' })
+if ($hposter.Count -eq 1) {
+  Copy-Item $hposter[0].FullName 'public\videos\hero-poster.jpg' -Force
+  Write-Host "[OK] POSTER: '$($hposter[0].Name)' -> public\videos\hero-poster.jpg" -ForegroundColor Green
+}
+
+# ---- ویدیوهای چهار خدمت: فقط وقتی دقیقا یک تطابق باشد خودکار کپی می‌شود ----
+$serviceMap = @(
+  @{ dest='ai-business-intelligence.mp4';     pat='ai[-_ ]|business[-_ ]|intellig' },
+  @{ dest='ai-content-production.mp4';        pat='content[-_ ]|production' },
+  @{ dest='business-automation-workflow.mp4'; pat='automation|workflow|n8n' },
+  @{ dest='digital-growth-system.mp4';        pat='growth|marketing|advertising' }
+)
+foreach ($m in $serviceMap) {
+  $hit = @($videos | Where-Object { $_.Name -match $m.pat })
+  if ($hit.Count -eq 1) {
+    Copy-Item $hit[0].FullName "public\videos\$($m.dest)" -Force
+    Write-Host "[OK] $($m.dest): از '$($hit[0].Name)'" -ForegroundColor Green
+  } elseif ($hit.Count -gt 1) {
+    Write-Host "[??] برای $($m.dest) چند کاندیدا هست — خودت انتخاب کن:" -ForegroundColor Yellow
+    $hit | ForEach-Object { "       $($_.Name)" }
+  }
+}
+
+# ---- عکس درباره‌ما: فقط تطابق یکتا ----
+$about = @($images | Where-Object { $_.Name -match 'about|portrait|profile|پرتره' })
+if ($about.Count -eq 1) {
+  Copy-Item $about[0].FullName 'public\images\about-workspace.jpg' -Force
+  Write-Host "[OK] ABOUT: '$($about[0].Name)' -> public\images\about-workspace.jpg" -ForegroundColor Green
+}
+
+Write-Host "`nتمام. حالا: npm run dev  و در مرورگر Ctrl+Shift+R" -ForegroundColor Cyan

@@ -1,0 +1,25 @@
+{
+  "_comment": "نمونه پیکربندی — هیچ مقدار واقعی یا کلیدی در این فایل قرار نگیرد",
+  "provider": {
+    "chat_provider": "local",
+    "notes": "local = رایگان و بدون کلید | openai-compatible = هر سرویس سازگار (کلید فقط در .env سرور)",
+    "chat_api_base": "https://api.example-provider.com/v1",
+    "chat_model": "model-name-here"
+  },
+  "lead_capture": {
+    "webhook_url": "https://your-n8n.example.com/webhook/chatbot-lead",
+    "webhook_token_env": "LEAD_WEBHOOK_TOKEN",
+    "rate_limit_chat_per_5min": 20,
+    "rate_limit_lead_per_10min": 3
+  },
+  "retention": {
+    "visitor_data_retention_days": null,
+    "lead_data_retention_days": null,
+    "_note": "تا وقتی null است حذف خودکار انجام نمی‌شود"
+  },
+  "privacy": {
+    "consent_required": true,
+    "data_stored_in": ".leads/ (سرور — عمومی نیست)",
+    "excel_export": "فاز بعدی — ماژول visitor-data-collector"
+  }
+}

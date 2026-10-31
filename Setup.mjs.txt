@@ -1,0 +1,61 @@
+// راه‌انداز ساختار پروژه — سازگار با ویندوز، مک و لینوکس
+// اجرا: node setup.mjs
+import { mkdirSync, renameSync, existsSync } from "node:fs";
+import path from "node:path";
+
+const moves = [
+  ["package_json.json", "package.json"],
+  ["tsconfig_json.json", "tsconfig.json"],
+  ["tailwind_config_ts.ts", "tailwind.config.ts"],
+  ["postcss_config_mjs.txt", "postcss.config.mjs"],
+  ["next_config_mjs.txt", "next.config.mjs"],
+  ["setup_sh.txt", "setup.sh"],
+  ["app_globals_css.css", "app/globals.css"],
+  ["app_layout_tsx.tsx", "app/layout.tsx"],
+  ["app_page_tsx.tsx", "app/page.tsx"],
+  ["app_not_found_tsx.tsx", "app/not-found.tsx"],
+  ["app_sitemap_ts.ts", "app/sitemap.ts"],
+  ["app_robots_ts.ts", "app/robots.ts"],
+  ["app_api_leads_route_ts.ts", "app/api/leads/route.ts"],
+  ["app_services_slug_page_tsx.tsx", "app/services/[slug]/page.tsx"],
+  ["app_about_page_tsx.tsx", "app/about/page.tsx"],
+  ["components_ui_core_tsx.tsx", "components/ui/core.tsx"],
+  ["components_layout_header_tsx.tsx", "components/layout/header.tsx"],
+  ["components_sections_hero_tsx.tsx", "components/sections/hero.tsx"],
+  ["components_sections_system_tsx.tsx", "components/sections/system.tsx"],
+  ["components_sections_offerings_tsx.tsx", "components/sections/offerings.tsx"],
+  ["components_sections_proof_contact_tsx.tsx", "components/sections/proof-contact.tsx"],
+  ["data_content_ts.ts", "data/content.ts"],
+  ["lib_site_config_ts.ts", "lib/site-config.ts"],
+  ["env_local.txt", ".env.local"],
+];
+
+const dirs = [
+  "app/api/leads",
+  "app/services/[slug]",
+  "app/about",
+  "components/ui",
+  "components/layout",
+  "components/sections",
+  "data",
+  "lib",
+  "public",
+];
+
+console.log("▶ ساخت پوشه‌ها...");
+for (const dir of dirs) mkdirSync(dir, { recursive: true });
+
+console.log("▶ جابه‌جایی فایل‌ها...");
+let done = 0;
+for (const [from, to] of moves) {
+  if (!existsSync(from)) continue;
+  if (existsSync(to)) continue; // قبلاً جابه‌جا شده
+  renameSync(from, path.join(to));
+  done++;
+  console.log(`  ✓ ${from} → ${to}`);
+}
+
+console.log(`\n✅ ${done} فایل جابه‌جا شد.`);
+console.log("حالا اجرا کنید:");
+console.log("  npm install");
+console.log("  npm run dev");
